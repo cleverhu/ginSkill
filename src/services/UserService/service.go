@@ -1,12 +1,10 @@
 package UserService
 
 import (
-	"fmt"
+	"ginSkill/src/dbs"
 	"ginSkill/src/models/UserModel"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
-	"github.com/sirupsen/logrus"
-	"log"
 	"time"
 )
 
@@ -15,16 +13,7 @@ var (
 )
 
 func init() {
-	err := fmt.Errorf("")
-	db, err = gorm.Open("mysql", "root:123456@tcp(101.132.138.205:3306)/test?charset=utf8mb4&parseTime=true")
-	if err != nil {
-		log.Fatal(err)
-	}
-	db.LogMode(true)
-	logger := logrus.New()
-	db.SetLogger(logger)
-	db.DB().SetMaxIdleConns(5)
-	db.DB().SetMaxOpenConns(10)
+	db = dbs.Orm
 }
 
 //insert
@@ -42,7 +31,6 @@ func DeleteByID(id int) bool {
 //queryb
 func QueryByID(id int) *UserModel.UserModelImpl {
 	u := UserModel.New()
-
 	db.First(&u, id)
 	return u
 }

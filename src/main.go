@@ -2,33 +2,38 @@ package main
 
 import (
 	"fmt"
+	"ginSkill/src/common"
+	_ "ginSkill/src/dbs"
+	"ginSkill/src/handlers"
 	"ginSkill/src/models/UserModel"
 	"ginSkill/src/services/UserService"
+	"github.com/gin-gonic/gin"
+	"log"
 )
 
 func main() {
-	//testDel()
-	//testInsert()
-	//testQuery(100)
-	//testPageQuery(1, 100)
-	//testUpdate()
+
+	r := gin.New()
+	r.Use(common.ErrorHandler())
+
+	//查询用户列表
+	r.GET("/users", handlers.UserList)
+
+	//查询单个用户
+	r.GET("/users/:id", handlers.UserDetail)
+
+	//新增用户
+	r.PUT("/users", handlers.AddUser)
+
+	//修改用户
+	r.POST("/users", handlers.UpdateUser)
+
+	//删除用户
+	r.DELETE("/users/:id", handlers.DeleteUser)
 
 
 
-	//r := gin.New()
-	//
-	//r.GET("/", func(ctx *gin.Context) {
-	//	ctx.JSON(200, gin.H{"user": "user"})
-	//})
-	//r.PUT("/", func(ctx *gin.Context) {
-	//	u := UserModel.New()
-	//	err := ctx.ShouldBindJSON(&u)
-	//
-	//})
-	//
-	//
-	//
-	//log.Fatal(r.Run(":80"))
+	log.Fatal(r.Run(":80"))
 }
 
 func testInsert() {
