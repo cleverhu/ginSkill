@@ -23,8 +23,7 @@ func UserList(ctx *gin.Context) {
 		size = 10
 	}
 
-	us := Getter.UserGetter.GetUserListByPage(page, size)
-	R(ctx)("query users success", "10000", us)(OK)
+	R(ctx)("query users success", "10000", Getter.UserGetter.GetUserListByPage(page, size))(OK)
 }
 
 func UserDetail(ctx *gin.Context) {
