@@ -1,6 +1,9 @@
 package result
 
-import "fmt"
+import (
+	"fmt"
+	"ginSkill/src/validators"
+)
 
 type ErrorResult struct {
 	Err  error
@@ -9,6 +12,7 @@ type ErrorResult struct {
 
 func (this *ErrorResult) Unwrap() interface{} {
 	if this.Err != nil {
+		validators.CheckErrors(this.Err)
 		panic(this.Err.Error())
 	}
 

@@ -2,6 +2,7 @@ package Setter
 
 import (
 	"fmt"
+	"ginSkill/src/data/mappers"
 	"ginSkill/src/dbs"
 	"ginSkill/src/models/UserModel"
 	"ginSkill/src/result"
@@ -23,18 +24,47 @@ type IUserSetter interface {
 }
 
 type UserSetterImpl struct {
+	userMapper *mappers.UserMapper
+	logMapper  *mappers.LogMapper
 }
 
 func NewUserSetterImpl() *UserSetterImpl {
-	return &UserSetterImpl{}
+	return &UserSetterImpl{
+		userMapper: &mappers.UserMapper{},
+		logMapper:  &mappers.LogMapper{},
+	}
 }
 
 func (this *UserSetterImpl) DeleteUserByID(id int) *result.ErrorResult {
-	u := UserModel.New(UserModel.WithUserID(id))
-	if dbs.Orm.First(&u).RecordNotFound() == false && dbs.Orm.Delete(&u).RowsAffected == 1 {
-		return &result.ErrorResult{
-			Err:  nil,
-			Data: gin.H{"success": true, "user": u},
+	u := UserModel.New()
+	if this.userMapper.GetUserByID(id).Query().Find(&u).RecordNotFound() == false {
+		//delUser := this.userMapper.DeleteUserByID(id).Exec().RowsAffected
+		//addLog := this.logMapper.AddLog(LogModel.NewLogImpl("del user", time.Now()))
+		//err := mappers.Mappers(delUser, addLog).Exec(func() error {
+		//	err := delUser.Exec().Error
+		//	fmt.Println(err)
+		//	if err != nil {
+		//		return err
+		//	}
+		//	//干一些其他的业务
+		//
+		//	err = addLog.Exec().Error
+		//	fmt.Println(err)
+		//	if err != nil {
+		//		return err
+		//	}
+		//	return nil
+		//})
+		if this.userMapper.DeleteUserByID(id).Exec().RowsAffected == 1 {
+			return &result.ErrorResult{
+				Err:  nil,
+				Data: gin.H{"success": true, "user": u},
+			}
+		} else {
+			return &result.ErrorResult{
+				Err:  fmt.Errorf("delete failed"),
+				Data: nil,
+			}
 		}
 	} else {
 		return &result.ErrorResult{
@@ -42,6 +72,20 @@ func (this *UserSetterImpl) DeleteUserByID(id int) *result.ErrorResult {
 			Data: nil,
 		}
 	}
+
+	//if .RowsAffected == 1 {
+	//	return &result.ErrorResult{
+	//		Err:  nil,
+	//		Data: gin.H{"success": true, "user": u},
+	//	}
+	//} else {
+	//	return &result.ErrorResult{
+	//		Err:  fmt.Errorf("delete failed,not found id:%d", id),
+	//		Data: nil,
+	//	}
+	//}
+
+	return nil
 }
 
 func (this *UserSetterImpl) AddUser(u *UserModel.UserModelImpl) *result.ErrorResult {
@@ -69,7 +113,7 @@ func (this *UserSetterImpl) UpdateUser(u *UserModel.UserModelImpl) *result.Error
 	} else {
 		return &result.ErrorResult{
 			Err:  fmt.Errorf("update user failed,user not existes"),
-			Data:nil,
+			Data: nil,
 		}
 	}
 }
